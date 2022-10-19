@@ -1,0 +1,63 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      httpclient:
+        wiretap: true
+      httpserver:
+        wiretap: true
+      routes:
+        - id: auth_login
+          uri: ${client.auth.uri}
+          predicates:
+            - Path=/api/auth/login
+            - Method=POST
+          filters:
+            - StripPrefix=1
+
+        - id: auth_register
+          uri: ${client.auth.uri}
+          predicates:
+            - Path=/api/auth/register
+            - Method=POST
+          filters:
+            - SetPath=/auth/signup
+
+        - id: auth_refresh
+          uri: ${client.auth.uri}
+          predicates:
+            - Path=/api/auth/refresh
+            - Method=POST
+          filters:
+            - StripPrefix=1
+
+        - id: auth_docs
+          uri: ${client.auth.uri}
+          predicates:
+            - Path=/api/auth/docs
+            - Method=GET
+          filters:
+            - StripPrefix=1
+
+client:
+  auth:
+    uri: http://localhost:8888
+
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+server:
+  port: 8181
+
+logging:
+  level:
+    reactor:
+      netty: INFO
+    org:
+      springframework:
+        cloud:
+          gateway: TRACE
